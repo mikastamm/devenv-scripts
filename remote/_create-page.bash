@@ -16,16 +16,16 @@ echo "⚙️Creating page $domain..."
 
 source /home/bitnami/scripts/_env.bash
 # Create www dir
-mkdir $wwwDir
+mkdir -p $webRootDir
 groupadd $domain
-chown daemon:$domain $wwwDir
-sudo chmod 770 $wwwDir
+chown daemon:$domain $siteRootDir
+sudo chmod 770 $siteRootDir
 
 vhostConfig="
 <VirtualHost *:80>
   ServerName $domain
-  DocumentRoot $wwwDir
-<Directory \"$wwwDir\">
+  DocumentRoot $webRootDir
+<Directory \"$webRootDir\">
     Options -Indexes +FollowSymLinks -MultiViews
     AllowOverride None
     Require all granted

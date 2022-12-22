@@ -4,12 +4,12 @@
 echo "➡️Enter the URL that will be of the production site:"
 read prodSiteUrl
 echo "➡️Enter the directory where you want to clone the repository: ($(pwd))))"
-read wwwDir 
-wwwDir = ${wwwDir:-$PWD}
+read siteRootDir 
+siteRootDir = ${siteRootDir:-$PWD}
 
-  # cd to wwwDir and create a new repository using the specified template
-echo "📁 Changing to $wwwDir directory..."
-cd "$wwwDir"
+  # cd to siteRootDir and create a new repository using the specified template
+echo "📁 Changing to $siteRootDir directory..."
+cd "$siteRootDir"
 echo "🆕 Creating repository Klickstark/$prodSiteUrl..."
 gh repo create "Klickstark/$prodSiteUrl" --private --clone --template "https://github.com/Klickstark/wp-template.git"
 

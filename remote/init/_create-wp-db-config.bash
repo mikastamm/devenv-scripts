@@ -29,6 +29,6 @@ define( 'DB_PASSWORD', '$KS_DB_PASSWORD' );
 define( 'DB_HOST', '$KS_DB_HOST' );
 "
 echo "  💨 wp-database-config.php"
-echo $wpDatabaseConfig > "$wwwDir/wp-database-config.php"
+echo $wpDatabaseConfig > "$webRootDir/wp-database-config.php"
 
 #wFvCF6z0Ce6b4zhm

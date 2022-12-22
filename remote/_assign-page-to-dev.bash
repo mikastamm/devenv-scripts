@@ -15,7 +15,7 @@ userhome=$(getent passwd $username | awk -F: '{print $6}')
 usermod -a -G $domain $username
 
 #Create symlinks in users home dir
-sudo su $username -c "ln -s $wwwDir $userhome"
+sudo su $username -c "ln -s $siteRootDir $userhome"
 
 ## Creat symlink to configfile
 ###Create subfolder for domain

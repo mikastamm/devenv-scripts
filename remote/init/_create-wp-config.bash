@@ -23,6 +23,6 @@ require_once ABSPATH . 'wp-settings.php';
 "
 
 echo "  💨 wp-config.php"
-echo $wpConfigTemplate > "$wwwDir/wp-config.php"
+echo $wpConfigTemplate > "$webRpptDir/wp-config.php"
 
 

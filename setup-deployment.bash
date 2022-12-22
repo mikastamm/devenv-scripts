@@ -1,12 +1,8 @@
 #!/bin/bash
-# Prompt for prodSiteSsh, use prodSiteUrl if not provided
+
 read -p "➡️ Enter SSH Target (eg. user@0.0.0.0) for Production site (defaults to $prodSiteUrl): " prodSiteSsh
 prodSiteSsh=${prodSiteSsh:-$prodSiteUrl}
-
-# Prompt for prodSiteSshDir
-read -p "➡️ Enter directory of Prod Site www dir: " export prodSiteSshDir
-
-# Prompt for devSiteUrl
+read -p "➡️ Enter directory of Prod Site web dir: " export prodSiteWebRoot
 read -p "➡️ Enter url of dev site: " devSiteUrl
 
 # Create the config file
@@ -15,7 +11,7 @@ echo "💾 Creating config file at $config_file"
 cat > "$config_file" <<EOF
 prodSiteUrl=$prodSiteUrl
 prodSiteSsh=$prodSiteSsh
-prodSiteSshDir=$prodSiteSshDir
+prodSiteWebRoot=$prodSiteWebRoot
 devSiteUrl=$devSiteUrl
 EOF
 

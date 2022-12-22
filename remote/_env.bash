@@ -1,3 +1,4 @@
 vhostsDir="/opt/bitnami/apache/conf/vhosts/"
 adminUser="bitnami"
-wwwDir="/opt/bitnami/www/$domain"
+siteRootDir="/opt/bitnami/www/$domain"
+webRootDir="$siteRootDir/web"
