@@ -2,12 +2,18 @@
 ### Assign
 #create symlink in users home dir to www dir
 
+if [ -z "$1" ] || [ -z "$2" ]
+then
+    echo "Error: missing username or domain argument"
+    exit 1
+fi
+curdir="$( dirname $0 )" 
 username=$1
 domain=$2
 
 echo "⚙️Assigning $domain to user $username..."
 
-source /home/bitnami/scripts/_env.bash
+source $curdir/_env.bash
 
 userhome=$(getent passwd $username | awk -F: '{print $6}')
 

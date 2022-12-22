@@ -9,10 +9,10 @@ then
     echo "Error: missing username argument"
     exit 1
 fi
-
+dir="$(dirname $0)"
 username=$1
 echo "⚙️Creating $username..."
-source /home/bitnami/scripts/_env.bash
+source $dir/_env.bash
 
 adduser --disabled-password --gecos "" $username
 
