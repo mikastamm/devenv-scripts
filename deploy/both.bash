@@ -1,4 +1,5 @@
-
+#!/bin/bash
+# Deploys the database and media and plguin files to the prod environment. Use --full for a full deploy of all files
 doNotCopy=.env
 
 #Check if --full option is set

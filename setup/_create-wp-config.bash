@@ -3,7 +3,7 @@
 # Create persistent wp-config.php, that is tracked by git
 saltsPhp=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
 
-wpConfigTemplate = 
+wpConfigTemplate=
 "
 <?php
 

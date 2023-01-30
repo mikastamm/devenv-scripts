@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Setup connection to the production site
 read -p "➡️ Enter SSH Target (eg. user@0.0.0.0) for Production site (defaults to $prodSiteUrl): " prodSiteSsh
 prodSiteSsh=${prodSiteSsh:-$prodSiteUrl}
 read -p "➡️ Enter directory of Prod Site web dir: " export prodSiteWebRoot

@@ -1,3 +1,5 @@
+#!/bin/bash
+# Deploys files to the prod environment
 # Check if file .deploy exists 
 if [ ! -f ".deploy" ]; then
     echo "❌ Cannot deploy files: .deploy file not found in $PWD. Run setup-deployment.bash to create it"

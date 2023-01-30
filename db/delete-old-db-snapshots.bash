@@ -1,4 +1,5 @@
 #!/bin/bash
+# Deletes all but the 5 most recent database snapshots (eg. from dev db stash or deployment operations)
 # Store the current working directory
 cwd=$(pwd)
 

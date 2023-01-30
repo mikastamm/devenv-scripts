@@ -16,6 +16,7 @@ else
     read KS_DB_PASSWORD
     echo "  ➡️ Enter database host:"
     read KS_DB_HOST
+    source $(dirname $0)/_save-dot-env.bash
 fi
 
 wpDatabaseConfig = 
@@ -30,5 +31,3 @@ define( 'DB_HOST', '$KS_DB_HOST' );
 "
 echo "  💨 wp-database-config.php"
 echo $wpDatabaseConfig > "$webRootDir/wp-database-config.php"
-
-#wFvCF6z0Ce6b4zhm

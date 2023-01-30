@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Creates a new subdomain to be served by apache on the given domain
 #
 # Arguments:
@@ -11,11 +10,17 @@ then
     exit 1
 fi
 
+#error if not sudo
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
 curdir="$(dirname $0)"
 domain=$1
 echo "⚙️Creating page $domain..."
 
-source $curdir/_env.bash
+source $curdir/../_env.bash
 # Create www dir
 mkdir -p $webRootDir
 groupadd $domain
@@ -35,15 +40,8 @@ sshVhostConfig='
   LoadModule ssl_module modules/mod_ssl.so
 </IfModule>
 
-Listen 443
-SSLProtocol all -SSLv2 -SSLv3
-SSLHonorCipherOrder on
-SSLCipherSuite "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !EDH !RC4"
-SSLPassPhraseDialog  builtin
-SSLSessionCache "shmcb:/opt/bitnami/apache/logs/ssl_scache(512000)"
-SSLSessionCacheTimeout  300
-
 <VirtualHost *:443>
+  Options -Indexes +FollowSymLinks -MultiViews
   DocumentRoot '$webRootDir'
   ServerName '$domain'
 
@@ -53,7 +51,7 @@ SSLSessionCacheTimeout  300
 
   <Directory "'$webRootDir'">
     Options Indexes FollowSymLinks
-    AllowOverride None
+    AllowOverride All
     Require all granted
   </Directory>
 
@@ -72,7 +70,7 @@ vhostConfig="
   DocumentRoot $webRootDir
 <Directory \"$webRootDir\">
     Options -Indexes +FollowSymLinks -MultiViews
-    AllowOverride None
+    AllowOverride All
     Require all granted
 
     # Do not serve .* directories
@@ -89,7 +87,6 @@ vhostConfig="
   </Directory>
 </VirtualHost>
 
-Include \"$(pwd)$sslConfigFile\"
 "
 configFile="$vhostsDir$domain.conf"
 echo "$vhostConfig" > $configFile

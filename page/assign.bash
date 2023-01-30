@@ -1,5 +1,5 @@
 #!/bin/bash
-### Assign
+# Assign the page to a user, allowing them to edit it
 #create symlink in users home dir to www dir
 
 if [ -z "$1" ] || [ -z "$2" ]
@@ -13,7 +13,7 @@ domain=$2
 
 echo "⚙️Assigning $domain to user $username..."
 
-source $curdir/_env.bash
+source $curdir/../_env.bash
 
 userhome=$(getent passwd $username | awk -F: '{print $6}')
 
@@ -28,5 +28,12 @@ sudo su $username -c "ln -s $siteRootDir $userhome"
 #mkdir $userhome/$domain
 #set configFile "$vhostsDir$domain.conf"
 #ln -s $configFile $userhome/$domain/vhost.conf
+
+echo "Set as default page? (y/n)"
+read default
+if [ "$default" == "y" ] || [ "$default" == "yes" ]
+then
+    echo $siteRootDir > $userhome/.defaultpage
+fi
 
 echo "Done ✔️"

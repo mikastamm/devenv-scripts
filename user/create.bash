@@ -1,5 +1,5 @@
 #!/bin/bash
-# Creates the specified user
+# Creates the specified user on the dev server
 #
 # Arguments:
 # - username: the username to
@@ -9,10 +9,17 @@ then
     echo "Error: missing username argument"
     exit 1
 fi
+
+#error if not sudo
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
 dir="$(dirname $0)"
 username=$1
 echo "⚙️Creating $username..."
-source $dir/_env.bash
+source $dir/../_env.bash
 
 adduser --disabled-password --gecos "" $username
 
@@ -28,6 +35,4 @@ mkdir -p /home/$username/.ssh
 chmod 700 /home/$username/.ssh
 chown $username:$username /home/$username/.ssh
 
-# Give em fish shell
-#chsh -s $(which fish) $username
 echo "✔️ Done"
