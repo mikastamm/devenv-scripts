@@ -1,5 +1,6 @@
 #!/bin/bash
 # Deletes all but the 5 most recent database snapshots (eg. from dev db stash or deployment operations)
+
 # Store the current working directory
 cwd=$(pwd)
 
@@ -18,7 +19,7 @@ files=$(find . -maxdepth 1 -type f -printf '%T@ %p\n' | sort -n | cut -f2- -d" "
 file_count=$(echo "$files" | grep ".sql" | wc -l)
 
 # If there are more than 5 files
-if [ "$file_count" -gt 5 ]; then
+if [ "$file_count" -gt 10 ]; then
   # Delete all but the first 5 files
   echo "$files" | tac | grep ".sql" | tail -n +5 | xargs rm
 fi

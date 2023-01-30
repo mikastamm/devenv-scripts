@@ -53,6 +53,8 @@ sshVhostConfig='
     Options Indexes FollowSymLinks
     AllowOverride All
     Require all granted
+
+    Header set X-Robots-Tag "noindex, nofollow"
   </Directory>
 
   # Error Documents
@@ -72,6 +74,9 @@ vhostConfig="
     Options -Indexes +FollowSymLinks -MultiViews
     AllowOverride All
     Require all granted
+
+    Header set X-Robots-Tag \"noindex, nofollow\"
+
 
     # Do not serve .* directories
     RedirectMatch 404 /\\.

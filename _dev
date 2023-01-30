@@ -1,15 +1,28 @@
 #!/bin/bash
-#If first, second or third argument are --help, show help
+
 curdir=$(pwd)
 directory=$1
 script=$2
 argument=$3
+
 function prepend() { while read line; do echo "${1}${line}"; done; }
 
 #Determine page that will be edited
    #if ~/default_page exists, cd to its content
 if [ -f "$HOME/.defaultpage" ]; then
-    $siteRoot = $(cat $HOME/.defaultpage)
+    siteRoot=$(cat $HOME/.defaultpage)
+fi
+
+
+cd /home/bitnami/devenv-scripts
+source _util.bash
+#If current directory contains a file named .deploy, source it
+if [ -f ".dev" ]; then
+    source .dev
+elif [ -f "$siteRoot/.dev" ]; then
+    source $siteRoot/.dev
+else
+    devSiteUrl="${On_Red}NO SITE SELECTED${NC}";
 fi
 
 #If current directory contains a file named .deploy, source it
@@ -17,39 +30,30 @@ if [ -f ".deploy" ]; then
     source .deploy
 elif [ -f "$siteRoot/.deploy" ]; then
     source $siteRoot/.deploy
-else
-    devSiteUrl="NO SITE SELECTED";
 fi
 
-echo "[[ $devSiteUrl ]]";
+printf "[[ $devSiteUrl ]]";
 
-cd /home/bitnami/devenv-scripts
-# If argument is 'init', run the init-repo.bash script
-if [ "$directory" = "init" ]; then
-    script=init-repo
-elif [ -z "$directory" ]; then
-    echo "📁 $directory Commands"
-    ls -1 $directory | grep -v "^_" | sed $'s/\.[^.]*$//' | prepend "   └ "
-    exit 0
-#if $script is empty, list files in $directory without extension and excluding files starting with _
-elif [ -z "$script" ]; then
-    echo "📁 $directory Commands"
-    ls -1 $directory | grep -v "^_" | sed $'s/\.[^.]*$//' | prepend "   └ "
-    exit 0
-fi
+if [ -z "$directory" ]; then
+    echo ""
+        echo ""
 
-#if $argument is --help print the scripts name and the second line of $script file in $directory, exluding the first line
-if [ "$argument" = "--help" ]; then
-    echo -ne "dev $directory $script \t\t\t  "
-    sed -n '2p' $directory/$script.bash  | sed $'\ts/^.\{2\}//'
-    exit 0
-fi
+    echo "dev $directory"
+    ls -1 | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r directory; do
+        echo -e "  $directory"
+    ls -1 $directory | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r cmd; do
+        echo -ne "$cmd ${Gray}_"$(  sed -n '2p' $directory/$cmd.bash  | sed $'\ts/^.\{2\}//')${NC} | column -t -s "_" -o " " | prepend "    "
+      done
+    done
+        printf "\nUsage: dev [category] [action]"
+        printf "${Gray}\nExample: dev db pull${NC}"; echo
 
+    exit 0
 #if script is --help, do the same as above but for each file in $directory, excluding files starting with _
-if [ "$script" = "--help" ]; then
-    echo "📁 $directory Commands"
-    ls -1 $directory | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r line; do
-        echo -ne "dev $directory $line _"$(  sed -n '2p' $directory/$line.bash  | sed $'\ts/^.\{2\}//') | column -t -s "_" -o "   " | prepend "   └ "
+elif [ -z "$script" ]; then
+    echo "dev $directory"
+    ls -1 $directory | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r cmd; do
+        echo -ne "$cmd ${Gray}_"$(  sed -n '2p' $directory/$cmd.bash  | sed $'\ts/^.\{2\}//')${NC} | column -t -s "_" -o " " | prepend "    "
       
     done
     exit 0
@@ -58,9 +62,9 @@ fi
 #If $script is not empty, run the script in $directory
 if [ ! -z "$script" ]; then
     if [ -f "$directory/$script.bash" ]; then
-     
-
-        bash $directory/$script.bash $argument
+        cd $siteRoot
+        set -e
+        source /home/bitnami/devenv-scripts/$directory/$script.bash $argument
     else
         echo "Error: $script not found"
         exit 1

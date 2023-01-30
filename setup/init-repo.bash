@@ -1,7 +1,7 @@
 #!/bin/bash
 #Inititalized the wordpress installation on the dev machine and creates the repository on github
 
-echo "➡️Enter the URL that will be of the production site:"
+echo "➡️Enter the URL that will be of the production site: (eg. mysite.klickstark.net)"
 read prodSiteUrl
 echo "➡️Enter the directory where you want to clone the repository: ($(pwd))"
 read siteRootDir 
@@ -37,5 +37,5 @@ source $(dirname $0)/init/_create-wp-config.bash
 #ask wether the user wants to setup deployment, and execute deploy/setup-deployment.bash if yes
 read -p "🚀 Do you want to setup deployment? (y/n): " setupDeployment
 if [ "$setupDeployment" = "y" ]; then
-    source $(dirname $0)/deploy/setup-deployment.bash
+    source $(dirname $0)/deploy/setup.bash
 fi

@@ -6,14 +6,16 @@ if [ ! -f ".deploy" ]; then
     exit 1
 fi
 
+
+echo "⬆️ Creating snapshot of current database"
+$(dirname "$0")/stash.bash "before-pull"
 source .deploy
 echo "⏬ Downloading database from $prodSiteUrl"
 ssh $prodSiteSsh "cd $prodSiteWebRoot && wp db export - | gzip -9 > /tmp/$prodSiteUrl.sql.gz"
 scp $prodSiteSsh:/tmp/db.sql.gz /tmp/db.sql.gz
 ssh $prodSiteSsh "rm /tmp/$prodSiteUrl.sql.gz"
 gunzip /tmp/$prodSiteUrl.sql.gz
-echo "⬆️ Saving old database"
-wp db export - | gzip -9 > db-snapshots/${date +%Y-%m-%d}.sql.gz
+
 echo "🔥 Deleting old database snapshots"
 source local/db/delete-old-db-snapshots.bash
 
@@ -21,9 +23,11 @@ echo "⬇️ Importing database"
 wp db import /tmp/$prodSiteUrl.sql
 
 wp search-replace $prodSiteUrl $devSiteUrl
-wp option update blog_public 0
-# if last command failed alert!
-if [ $? -ne 0 ]; then
-    echo "❌ Could not disable search engine indexing!!! Please do it manually! ❌"
-    exit 1
-fi
+
+echo "🔑 Resetting user activation keys"
+wp user update $(wp user list) --user_activation_key="" 
+
+wp user create dev dev@dev.dev --role=administrator --user_pass=dev
+echo "🔑 Added Dev User:"
+echo "  Name: dev"
+echo "  Pass: dev"
