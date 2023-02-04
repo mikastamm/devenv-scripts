@@ -16,10 +16,8 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-dir="$(dirname $0)"
 username=$1
 echo "⚙️Creating $username..."
-source $dir/../_env.bash
 
 adduser --disabled-password --gecos "" $username
 
@@ -34,5 +32,7 @@ usermod -a -G remote-dev $username
 mkdir -p /home/$username/.ssh
 chmod 700 /home/$username/.ssh
 chown $username:$username /home/$username/.ssh
+
+sudo su $username -c "$SCRIPTS_DIR/user/_install-nvm.bash"
 
 echo "✔️ Done"

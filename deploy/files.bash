@@ -1,12 +1,10 @@
 #!/bin/bash
 # Deploys files to the prod environment
-# Check if file .deploy exists 
-if [ ! -f ".deploy" ]; then
-    echo "❌ Cannot deploy files: .deploy file not found in $PWD. Run setup-deployment.bash to create it"
+
+if [ -z $prodSiteUrl]; then
+    echo "❌ Cannot deploy files: $prodSiteUrl is not set, please run 'devenv deploy setup' or edit the .dev file in you project root"
     exit 1
 fi
-
-source .deploy
 
 echo "📦 Uploading files to $devSiteUrl"
 # Print all entries of $targetDirs

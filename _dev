@@ -1,54 +1,64 @@
 #!/bin/bash
 
 curdir=$(pwd)
+export SCRIPTS_DIR=/home/bitnami/devenv-scripts
 directory=$1
 script=$2
 argument=$3
 
 function prepend() { while read line; do echo "${1}${line}"; done; }
+function printSelectedSite(){
+    selectedSitePath=$(cat ~/.defaultpage 2>/dev/null)
+    if [ -z "$selectedSitePath" ]; then
+        selectedSite="${Red}NO SITE SELECTED${NC}"
+    else
+        selectedSite=$(basename $selectedSitePath)
+    fi
+    echo
+    echo
+    printf "[[ $selectedSite ]]";echo
+}
 
-#Determine page that will be edited
-   #if ~/default_page exists, cd to its content
-if [ -f "$HOME/.defaultpage" ]; then
-    siteRoot=$(cat $HOME/.defaultpage)
-fi
+#Loads all required variables for the selected site
+function loadSelectedSite(){
+    selectedSitePath=$(cat ~/.defaultpage 2>/dev/null)
+    if ! [ -z "$selectedSitePath" ]; then
+      siteRootDir=$selectedSitePath
+      export domain=$(basename $selectedSitePath)
+    fi
+    #if selectedSitePath contains a .dev file, source it
+    if [ -f "$selectedSitePath/.dev" ]; then
+        set -o allexport
+        source $selectedSitePath/.dev
+        set +o allexport
+    fi
+    #if both previous checks succeeded, source $SCRIPTS_DIR/_env.bash
+    if ! [ -z "$siteRootDir" ] && [ -f "$selectedSitePath/.dev" ]; then
+        source $SCRIPTS_DIR/_env.bash
+    fi     
+}
 
-
+loadSelectedSite
 cd /home/bitnami/devenv-scripts
 source _util.bash
-#If current directory contains a file named .deploy, source it
-if [ -f ".dev" ]; then
-    source .dev
-elif [ -f "$siteRoot/.dev" ]; then
-    source $siteRoot/.dev
-else
-    devSiteUrl="${On_Red}NO SITE SELECTED${NC}";
-fi
-
-#If current directory contains a file named .deploy, source it
-if [ -f ".deploy" ]; then
-    source .deploy
-elif [ -f "$siteRoot/.deploy" ]; then
-    source $siteRoot/.deploy
-fi
-
-printf "[[ $devSiteUrl ]]";
 
 if [ -z "$directory" ]; then
-    echo ""
         echo ""
 
+    #Non priv commands
     echo "dev $directory"
     ls -1 | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r directory; do
         echo -e "  $directory"
-    ls -1 $directory | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r cmd; do
-        echo -ne "$cmd ${Gray}_"$(  sed -n '2p' $directory/$cmd.bash  | sed $'\ts/^.\{2\}//')${NC} | column -t -s "_" -o " " | prepend "    "
-      done
+        ls -1 $directory | grep -v "^_" | sed 's/\.[^.]*$//' | while read -r cmd; do
+            echo -ne "$cmd ${Gray}_"$(  sed -n '2p' $directory/$cmd.bash  | sed $'\ts/^.\{2\}//')${NC} | column -t -s "_" -o " " | prepend "    "
+        done
     done
-        printf "\nUsage: dev [category] [action]"
-        printf "${Gray}\nExample: dev db pull${NC}"; echo
 
+    printf "\nUsage: dev [category] [action]"
+    printf "${Gray}\nExample: dev db pull${NC}"
+    printSelectedSite
     exit 0
+
 #if script is --help, do the same as above but for each file in $directory, excluding files starting with _
 elif [ -z "$script" ]; then
     echo "dev $directory"
@@ -56,15 +66,16 @@ elif [ -z "$script" ]; then
         echo -ne "$cmd ${Gray}_"$(  sed -n '2p' $directory/$cmd.bash  | sed $'\ts/^.\{2\}//')${NC} | column -t -s "_" -o " " | prepend "    "
       
     done
+    printSelectedSite
     exit 0
 fi
 
 #If $script is not empty, run the script in $directory
 if [ ! -z "$script" ]; then
     if [ -f "$directory/$script.bash" ]; then
-        cd $siteRoot
+        cd $siteRootDir
         set -e
-        source /home/bitnami/devenv-scripts/$directory/$script.bash $argument
+        bash -e /home/bitnami/devenv-scripts/$directory/$script.bash ${@:3}
     else
         echo "Error: $script not found"
         exit 1

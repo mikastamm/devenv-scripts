@@ -7,13 +7,10 @@ then
     echo "Error: missing username or domain argument"
     exit 1
 fi
-curdir="$( dirname $0 )" 
 username=$1
 domain=$2
 
 echo "⚙️Assigning $domain to user $username..."
-
-source $curdir/../_env.bash
 
 userhome=$(getent passwd $username | awk -F: '{print $6}')
 
@@ -36,4 +33,15 @@ then
     echo $siteRootDir > $userhome/.defaultpage
 fi
 
+
+if [ -f /home/$username/creds/mysql-creds.bash ]
+then
+    source /home/$username/creds/mysql-creds.bash
+fi
+
+# Technically this only needs to run once, but it's idempotent so it's fine
+sudo setfacl -R -m g:remote-dev:rX /etc/letsencrypt/{live,archive}/shap3sdevel0.klickstark.net
+sudo setfacl -m g:remote-dev:rX /etc/letsencrypt/{live,archive}/ 
+
 echo "Done ✔️"
+

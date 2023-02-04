@@ -1,9 +1,6 @@
 #!/bin/bash
 # Creates a new subdomain to be served by apache on the given domain
-#
-# Arguments:
-# - domain: the domain to create the subdomain for
-
+# Args [domain]
 if [ -z "$1" ]
 then
     echo "Error: missing domain argument"
@@ -15,17 +12,19 @@ if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
   exit
 fi
-
-curdir="$(dirname $0)"
 domain=$1
+source $SCRIPTS_DIR/_env.bash
 echo "⚙️Creating page $domain..."
 
-source $curdir/../_env.bash
 # Create www dir
 mkdir -p $webRootDir
-groupadd $domain
+#only add group if it doesn't exist
+if ! grep -q $domain /etc/group; then
+    groupadd $domain
+fi
 chown daemon:$domain $siteRootDir -R
 sudo chmod 770 $siteRootDir -R
+sudo chmod g+s $siteRootDir -R
 
 ###################################################
 
@@ -98,12 +97,30 @@ echo "$vhostConfig" > $configFile
 
 ###################################################
 
+echo "🔑 Creating database..."
+source /home/bitnami/creds/mysql-admin.bash
 
+#if /home/bitnami/creds/$domain.env already exists, exit
+if ! [ -f "/home/bitnami/creds/$domain.env" ]; then 
+  /opt/bitnami/mariadb/bin/mariadb -u $mysqlAdmin -p$mysqlPassword -e "CREATE DATABASE IF NOT EXISTS $devSubdomain;"
+  echo "Creating database user"
+  mysqlPass=$(openssl rand -base64 15)
+  /opt/bitnami/mariadb/bin/mariadb -u $mysqlAdmin -p$mysqlPassword -e "CREATE USER IF NOT EXISTS '$devSubdomain'@'%' IDENTIFIED BY '$mysqlPass';"
+  echo "
+  WP_ENV=dev
+  DB_HOST=localhost
+  DB_NAME=$devSubdomain
+  DB_USER=$devSubdomain
+  DB_PASSWORD=$mysqlPass" >> /home/bitnami/creds/$domain.env
 
+  echo "Granting privileges to user $domain on database '$domain'"
+  /opt/bitnami/mariadb/bin/mariadb -u $mysqlAdmin -p$mysqlPassword -e "GRANT ALL PRIVILEGES ON $devSubdomain.* TO '$devSubdomain'@'%'; FLUSH PRIVILEGES;"
+  echo "Done! Credentails are stored in /home/bitnami/creds/mysql-creds.bash"
+  source $SCRIPTS_DIR/page/assign.bash $adminUser $domain
+else
+  echo "Database already exists. Skipping db & user creation. Credentials are in /home/bitnami/creds/$domain.env"
+fi
 
 echo "✔️ Done"
-source $curdir/_assign-page-to-dev.bash $adminUser $domain
-
-
 
 sudo /opt/bitnami/ctlscript.sh start apache
