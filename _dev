@@ -32,9 +32,9 @@ function loadSelectedSite(){
         source $selectedSitePath/.dev
         set +o allexport
     fi
-    #if both previous checks succeeded, source $SCRIPTS_DIR/_env.bash
+    #if both previous checks succeeded, source $SCRIPTS_DIR/_config.bash
     if ! [ -z "$siteRootDir" ] && [ -f "$selectedSitePath/.dev" ]; then
-        source $SCRIPTS_DIR/_env.bash
+        source $SCRIPTS_DIR/_config.bash
     fi     
 }
 

@@ -13,7 +13,7 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 domain=$1
-source $SCRIPTS_DIR/_env.bash
+source $SCRIPTS_DIR/_config.bash
 echo "⚙️Creating page $domain..."
 
 # Create www dir

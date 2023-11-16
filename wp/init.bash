@@ -9,7 +9,7 @@ siteRootDir=${siteRootDir:-$PWD}
 
 #It is assumed that the dirname is the same as the dev url
 domain=$(basename $siteRootDir)
-source $SCRIPTS_DIR/_env.bash
+source $SCRIPTS_DIR/_config.bash
   # cd to siteRootDir and create a new repository using the specified template
 echo "📁 Changing to $siteRootDir directory..."
 cd "$siteRootDir"
