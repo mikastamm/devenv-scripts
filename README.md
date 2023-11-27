@@ -44,23 +44,21 @@ Note: SSH connection to the production Server has to be setup on your machine be
 ## Setup
 Configure `_config.bash` with your environment specifics
 
-## File Structure
-The typical file structure for a project is as follows:
-
-.
-├── wp-cli.yml      
-├── web             # WordPress installation
-│   └── wp-content, ...
-├── prod.env        
-├── dev.env         
-├── db-snapshots    # Database snapshots
-└── .dev            # SSH connection details for prod server (Dev server only)
+```
+export adminUser="bitnami"
+#Config files and metadata for each page are stored here
+export siteRootDir="/opt/bitnami/www/$domain"
+#eg. wndevel0
+#The directory served by apache when visiting your subdomain 
+export webRootDir="$siteRootDir/web"
+...
+```
 
 ## Deployment
-Deploy directly to the production server using the tools provided.
+Run `dev deploy setup` to start the guided setup process for ssh access to the production server.
 
-### Setup 
-Specify the production server location in .dev (template available as .dev.example). Create this file by running dev setup init-repo.
+### Manual Setup
+Alternatively, you can specify the production server location in .dev (template available as .dev.example). Create this file by running dev setup init-repo.
 
 Example .dev configuration:
 ```
